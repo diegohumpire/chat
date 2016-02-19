@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <style>
+      form { 
+        position: fixed; 
+        bottom: 0; 
+        right: 0;
+        padding-bottom: 10px;
+        padding-right: 10px;
+      }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <body>
+
+    <ul id="messages"></ul>
+
+    <form class="form-inline" action="">
+      <div class="form-group">
+        <div class="input-group">
+          <div class="information">
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="input-group">
+          <div class="input-group-addon">Message</div>
+          <input id="m" class="form-control" autocomplete="off" />
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="input-group">
+          <div class="input-group-addon">User</div>
+          <input id="user" class="form-control" autocomplete="off" value="USER CLIENTE"/>
+        </div>
+      </div>
+      <button class="btn btn-info btn-md">Send</button>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      var socket = io();
+
+      $('form').submit(function(){
+        var message = {
+          user: $('#user').val(),
+          message: $('#m').val()
+        }
+        socket.emit('chat message', message);
+        $('#m').val('');
+        return false;
+      });
+
+      socket.on('welcome message', function(msg){
+        $('#messages').append($('<li>').text(msg));
+      });
+
+      socket.on('disconnect', function(msg) {
+        $('#messages').append($('<li>').text(msg));
+      });
+
+      socket.on('connect user', function(msg) {
+        $('#messages').append($('<li>').text(msg));
+      });
+
+      socket.on('chat message', function(msg){
+        $('#messages').append($('<li>').text(msg));
+      });
+
+      socket.on('is typing', function(msg) {
+        $('.information').text(msg);
+      });
+
+      $('#m').keydown(function(event) {
+        var user = $('#user').val();
+        socket.emit('is typing', user);        
+      });
+
+      $('#m').keyup(function(){
+        setTimeout(function(){
+          socket.emit('is typing done'); 
+        }, 1500);
+      })
+
+      socket.on('is typing done', function(flag){
+        if (flag) {
+          $('.information').empty();
+        }
+      });
+
+      $(document).ready(function() {
+        socket.emit('connect user', $('#user').val());
+      });
+    </script>
+  </body>
+</html>
