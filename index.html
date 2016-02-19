@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <!doctype html>
 <html>
   <head>
@@ -58,6 +57,17 @@
         return false;
       });
 
+      $('#m').keydown(function(event) {
+        var user = $('#user').val();
+        socket.emit('is typing', user);        
+      });
+
+      $('#m').keyup(function(){
+        setTimeout(function(){
+          socket.emit('is typing done'); 
+        }, 1500);
+      });
+
       socket.on('welcome message', function(msg){
         $('#messages').append($('<li>').text(msg));
       });
@@ -77,17 +87,6 @@
       socket.on('is typing', function(msg) {
         $('.information').text(msg);
       });
-
-      $('#m').keydown(function(event) {
-        var user = $('#user').val();
-        socket.emit('is typing', user);        
-      });
-
-      $('#m').keyup(function(){
-        setTimeout(function(){
-          socket.emit('is typing done'); 
-        }, 1500);
-      })
 
       socket.on('is typing done', function(flag){
         if (flag) {

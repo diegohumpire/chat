@@ -8,23 +8,17 @@ app.get('/', function(req, res){
 
 io.on('connection', function(socket){
 
-  // console.log('a user connected');
   socket.emit('welcome message', 'Bienvenido al chat');
-
-  // io.sockets.emit('connect user', 'Un usuario se conectado');
 
   socket.on('connect user', function(msg){
     socket.broadcast.emit('connect user', 'El usuario ' + msg + ' se conectado');
   });
 
-
   socket.on('disconnect', function(){
-    // console.log('user disconnected');
     io.emit('disconnect', 'Un usuario se a desconectado del chat');
   });
 
   socket.on('chat message', function(msg){
-    // console.log('message: ' + msg);
     io.emit('chat message', msg.user + ': ' + msg.message);
   });
 
